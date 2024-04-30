@@ -1,8 +1,11 @@
 package learnprogramming.academy
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import java.math.BigDecimal
 
 
 private const val TAG = "CalculatorViewModel"
@@ -11,9 +14,17 @@ class CalculatorViewModel : ViewModel() {
     private var pendingOperation = "="
     private var operationPerformed = false
 
-    var result = MutableLiveData<String>()
-    var newNumber = MutableLiveData<String>()
-    var operation = MutableLiveData<String>()
+    private var result = MutableLiveData<Double>()
+    val resultValue: LiveData<String>
+        get() = result.map { it.toString() }
+
+    private var newNumber = MutableLiveData<String>()
+    val newNumberValue: LiveData<String>
+        get() = newNumber
+
+    private var operation = MutableLiveData<String>()
+    val operationValue: LiveData<String>
+        get() = operation
 
     fun digitPressed(buttonName: String) {
         if (!newNumber.isInitialized) {
@@ -41,21 +52,24 @@ class CalculatorViewModel : ViewModel() {
     }
 
     private fun performPendingOperation(value: Double) {
-        var currentResult: Double
-        if (!result.isInitialized || result.value!!.isEmpty()) {
-            result.value = value.toString()
+        var currentResult: BigDecimal
+        val decimalValue: BigDecimal = value.toBigDecimal()
+        if (!result.isInitialized) {
+            result.value = value
             return
         } else {
-            currentResult = result.value.toString().toDouble()
+            currentResult = result.value.toString().toBigDecimal()
         }
         when (pendingOperation) {
-            "+" -> currentResult += value
-            "-" -> currentResult -= value
-            "*" -> currentResult *= value
-            "/" -> if (value == 0.0) currentResult = Double.NaN else currentResult /= value
-            "=" -> currentResult = value
+            "+" -> currentResult += decimalValue
+            "-" -> currentResult -= decimalValue
+            "*" -> currentResult *= decimalValue
+            "/" -> if (value == 0.0) currentResult =
+                BigDecimal(Double.NaN) else currentResult /= decimalValue
+
+            "=" -> currentResult = decimalValue
         }
-        result.value = currentResult.toString()
+        result.value = currentResult.toDouble()
         operationPerformed = true
     }
 

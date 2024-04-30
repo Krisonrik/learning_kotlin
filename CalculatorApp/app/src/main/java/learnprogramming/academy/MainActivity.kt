@@ -18,13 +18,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
         val viewModel = ViewModelProvider(this)[CalculatorViewModel::class.java]
-        viewModel.result.observe(
+        viewModel.resultValue.observe(
             this
         ) { stringResult: String -> binding.result.setText(stringResult) }
-        viewModel.newNumber.observe(
+        viewModel.newNumberValue.observe(
             this
         ) { stringResult: String -> binding.newNumber.setText(stringResult) }
-        viewModel.operation.observe(
+        viewModel.operationValue.observe(
             this
         ) { stringResult: String -> binding.operation.text = stringResult }
 
